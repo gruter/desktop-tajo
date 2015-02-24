@@ -22,52 +22,54 @@ tajo_temp_dir="$tajo_home/data/tempdir"
 tajo_worker_heap=1024
 #cpu_cores=$(grep -c processor /proc/cpuinfo)
 disk_count=0
-
-if [ -z $java_home ]; then
-   echo "Enter JAVA_HOME [required]"
-   read java_home
-else
-   echo "Enter JAVA_HOME [default: $java_home]"
-   read set_java_home
-   if [ ! -z $set_java_home ]; then
-      java_home=$set_java_home
-   fi
-fi
-while [ 1 ]
-do
+input_param=$1
+if [ $input_param != "-f" ];then #----wrap param start
    if [ -z $java_home ]; then
       echo "Enter JAVA_HOME [required]"
       read java_home
-      continue
    else
-      break
+      echo "Enter JAVA_HOME [default: $java_home]"
+      read set_java_home
+      if [ ! -z $set_java_home ]; then
+         java_home=$set_java_home
+      fi
    fi
-done
-echo "Would you like advanced configure? [y/n]"
-read advanced
-if  [ ! -z $advanced ] && [ $advanced = "y" ]
-then
-   echo "Enter tajo.rootdir [default: $tajo_root_dir]"
-   read t_tajo_root_dir
-   if [ ! -z $t_tajo_root_dir ]; then
-      tajo_root_dir=$t_tajo_root_dir
+   while [ 1 ]
+   do
+      if [ -z $java_home ]; then
+         echo "Enter JAVA_HOME [required]"
+         read java_home
+         continue
+      else
+         break
+      fi
+   done
+   echo "Would you like advanced configure? [y/n]"
+   read advanced
+   if  [ ! -z $advanced ] && [ $advanced = "y" ]
+   then
+      echo "Enter tajo.rootdir [default: $tajo_root_dir]"
+      read t_tajo_root_dir
+      if [ ! -z $t_tajo_root_dir ]; then
+         tajo_root_dir=$t_tajo_root_dir
+      fi
+      echo "Enter tajo.staging.directory [default: $tajo_staging_dir]"
+      read t_tajo_staging_dir
+      if [ ! -z $t_tajo_staging_dir ]; then
+         tajo_staging_dir=$t_tajo_staging_dir
+      fi
+      echo "Enter tajo.worker.tmpdir.locations [default: $tajo_temp_dir]"
+      read t_tajo_temp_dir
+      if [ ! -z $t_tajo_temp_dir ]; then
+         tajo_temp_dir=$t_tajo_temp_dir
+      fi
+      echo "Enter heap size(MB) for worker [default: $tajo_worker_heap]"
+      read t_tajo_worker_heap
+      if [ ! -z $t_tajo_worker_heap ]; then
+         tajo_worker_heap=$t_tajo_worker_heap
+      fi
    fi
-   echo "Enter tajo.staging.directory [default: $tajo_staging_dir]"
-   read t_tajo_staging_dir
-   if [ ! -z $t_tajo_staging_dir ]; then
-      tajo_staging_dir=$t_tajo_staging_dir
-   fi
-   echo "Enter tajo.worker.tmpdir.locations [default: $tajo_temp_dir]"
-   read t_tajo_temp_dir
-   if [ ! -z $t_tajo_temp_dir ]; then
-      tajo_temp_dir=$t_tajo_temp_dir
-   fi
-   echo "Enter heap size(MB) for worker [default: $tajo_worker_heap]"
-   read t_tajo_worker_heap
-   if [ ! -z $t_tajo_worker_heap ]; then
-      tajo_worker_heap=$t_tajo_worker_heap
-   fi
-fi
+fi #----wrap param end
 tajo_worker_concurrency=$(( ${tajo_worker_heap} / 2400 ))
 if [ $tajo_worker_concurrency -le 1 ]; then
    tajo_worker_concurrency=1
