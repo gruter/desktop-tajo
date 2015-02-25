@@ -44,7 +44,7 @@ if [ $input_param != "-f" ];then #----wrap param start
          break
       fi
    done
-   echo "Would you like advanced configure? [y/n]"
+   echo "Would you like advanced configure? [y/N]"
    read advanced
    if  [ ! -z $advanced ] && [ $advanced = "y" ]
    then
