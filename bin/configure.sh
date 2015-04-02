@@ -23,7 +23,7 @@ tajo_worker_heap=1024
 #cpu_cores=$(grep -c processor /proc/cpuinfo)
 disk_count=0
 input_param=$1
-if [ $input_param != "-f" ];then #----wrap param start
+if [ "$input_param" != "-f" ];then #----wrap param start
    if [ -z $java_home ]; then
       echo "Enter JAVA_HOME [required]"
       read java_home
@@ -79,6 +79,9 @@ for d in `echo $tajo_temp_dir | sed -e s/\,/\ /g`
 do
         disk_count=$(( ${disk_count} + 1 ))
 done
+if [ ! -d "${tajo_home}/conf" ]; then
+   mkdir ${tajo_home}/conf
+fi
 if [ -f "${tajo_home}/conf/tajo-env.sh" ]; then
    rm ${tajo_home}/conf/tajo-env.sh
 fi
