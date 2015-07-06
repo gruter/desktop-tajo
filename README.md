@@ -14,30 +14,31 @@ Tajo Desktop Package Installation
 3. Installation
 
     3.1. Extract the package file in a directory
- 
-	$ tar xvfz tajo-x.x.x-desktop-x.x.tar.gz
-	$ cd tajo-x.x.x-desktop-x.x
- 
-    3.2. Configure 
-	Set JAVA_HOME, Tajo directories and heap memory size. 
 
-	$ bin/configure.sh
-   	
-    3.3. Startup
-	Start Tajo master and worker(s).
+    $ tar xvfz tajo-x.x.x-desktop-x.tar.gz
+    $ cd tajo-x.x.x-desktop-x
 
-	$ bin/startup.sh
+    3.2. Configure Tajo
+    Set JAVA_HOME, Tajo directories and heap memory size.
 
-    3.4. Load sample data set (optional)
-	The script below will create "tpc_h10m" database and 8 tables. Make sure that Tajo is up and running to run this command.
+    $ bin/configure.sh
 
-	$ bin/make-test.sh
+    3.3. Initiate Tajo
+    Initiate the Tajo master and worker(s).
 
-    3.5. Run Tajo command-line shell "TSQL"     
-    
-	$ bin/tsql
-	Try \? for help.
-	default> 
+    $ bin/startup.sh
+
+    3.4. Load the sample data set (optional)
+    The script below will generate a sample database with 8 tables based on the TPC-H test data set.
+    Make sure Tajo has been properly initiated before running this command.
+
+    $ bin/your-massive-data.sh
+
+    3.5. Run the Tajo command-line shell (TSQL)
+
+    $ bin/tsql
+    Try \? for help.
+    default>
 
 4. Shutdown
     $ bin/shutdown.sh
