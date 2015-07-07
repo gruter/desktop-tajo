@@ -3,6 +3,7 @@
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
 
+
 if [ -f "$bin/tpc-h.tsql" ]; then
    RESULT=`"$bin/tsql" -f $bin/tpc-h.tsql`
    if [[ $RESULT == *"ERROR:"* ]]; then
