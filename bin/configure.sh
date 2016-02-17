@@ -14,14 +14,19 @@ echo "</configuration>"
 
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`
-java_home=$JAVA_HOME
-tajo_home=`cd "$bin/../"; pwd`
+source $bin/config.sh
+
 tajo_root_dir="file://$tajo_home/data/tajo"
 tajo_staging_dir="file://$tajo_home/data/staging"
+tajo_history_dir="file://$tajo_home/data/history"
 tajo_temp_dir="$tajo_home/data/tempdir"
 tajo_worker_heap=1024
-#cpu_cores=$(grep -c processor /proc/cpuinfo)
-disk_count=0
+tajo_cpu_cores=$(grep -c processor /proc/cpuinfo)
+if [ "1" == "$tajo_cpu_cores" ]
+then
+  tajo_cpu_cores=2
+fi
+tajo_disk_count=0
 input_param=$1
 if [ "$input_param" != "-f" ];then #----wrap param start
    if [ -z $java_home ]; then
@@ -58,10 +63,20 @@ if [ "$input_param" != "-f" ];then #----wrap param start
       if [ ! -z $t_tajo_staging_dir ]; then
          tajo_staging_dir=$t_tajo_staging_dir
       fi
+      echo "Enter tajo.history.task.dir [default: $tajo_history_dir]"
+      read t_tajo_history_dir
+      if [ ! -z $t_tajo_history_dir ]; then
+         tajo_history_dir=$t_tajo_history_dir
+      fi
       echo "Enter tajo.worker.tmpdir.locations [default: $tajo_temp_dir]"
       read t_tajo_temp_dir
       if [ ! -z $t_tajo_temp_dir ]; then
          tajo_temp_dir=$t_tajo_temp_dir
+      fi
+      echo "Enter vCore(CPU) count for worker [default: $tajo_cpu_cores]"
+      read t_tajo_cpu_cores
+      if [ ! -z $t_tajo_cpu_cores ]; then
+         tajo_cpu_cores=$t_tajo_cpu_cores
       fi
       echo "Enter heap size(MB) for worker [default: $tajo_worker_heap]"
       read t_tajo_worker_heap
@@ -70,24 +85,13 @@ if [ "$input_param" != "-f" ];then #----wrap param start
       fi
    fi
 fi #----wrap param end
-tajo_worker_concurrency=$(( ${tajo_worker_heap} / 2400 ))
-if [ $tajo_worker_concurrency -le 1 ]; then
-   tajo_worker_concurrency=1
-fi
-tajo_worker_resource_memory=$(( (${tajo_worker_concurrency} * 512) + 512 ))
-for d in `echo $tajo_temp_dir | sed -e s/\,/\ /g`
-do
-        disk_count=$(( ${disk_count} + 1 ))
-done
-if [ ! -d "${tajo_home}/conf" ]; then
-   mkdir ${tajo_home}/conf
-fi
+
 if [ -f "${tajo_home}/conf/tajo-env.sh" ]; then
    rm ${tajo_home}/conf/tajo-env.sh
 fi
 echo "export TAJO_WORKER_STANDBY_MODE=true" >> ${tajo_home}/conf/tajo-env.sh
 echo "export JAVA_HOME=$java_home" >> ${tajo_home}/conf/tajo-env.sh
-echo "export HADOOP_HOME=$tajo_home/hadoop" >> ${tajo_home}/conf/tajo-env.sh
+echo "export HADOOP_HOME=$hadoop_home" >> ${tajo_home}/conf/tajo-env.sh
 echo "export TAJO_PID_DIR=$tajo_home/pids" >> ${tajo_home}/conf/tajo-env.sh
 echo "export TAJO_WORKER_HEAPSIZE=$tajo_worker_heap" >> ${tajo_home}/conf/tajo-env.sh
 if [ ! -d $tajo_home/pids ]
@@ -101,12 +105,10 @@ if [ -f "${tajo_home}/conf/tajo-site.xml" ]; then
 fi
 echo $(start_configuration) >> ${tajo_home}/conf/tajo-site.xml
 echo $(set_property "tajo.rootdir" "${tajo_root_dir}") >> ${tajo_home}/conf/tajo-site.xml
+echo $(set_property "tajo.worker.resource.cpu-cores" "${tajo_cpu_cores}") >> ${tajo_home}/conf/tajo-site.xml
 echo $(set_property "tajo.staging.directory" "${tajo_staging_dir}") >> ${tajo_home}/conf/tajo-site.xml
+echo $(set_property "tajo.history.task.dir" "${tajo_history_dir}") >> ${tajo_home}/conf/tajo-site.xml
 echo $(set_property "tajo.worker.tmpdir.locations" ${tajo_temp_dir}) >> ${tajo_home}/conf/tajo-site.xml
-echo $(set_property "tajo.worker.resource.memory-mb" ${tajo_worker_resource_memory}) >> ${tajo_home}/conf/tajo-site.xml
-echo $(set_property "tajo.task.memory-slot-mb.default" "512") >> ${tajo_home}/conf/tajo-site.xml
-echo $(set_property "tajo.worker.resource.disks" "${disk_count}.0") >> ${tajo_home}/conf/tajo-site.xml
-#echo $(set_property "tajo.worker.resource.cpu-cores" ${cpu_cores}) >> ${tajo_home}/conf/tajo-site.xml
 echo $(set_property "tajo.worker.start.cleanup" "true") >> ${tajo_home}/conf/tajo-site.xml
 echo $(end_configuration) >> ${tajo_home}/conf/tajo-site.xml
 
