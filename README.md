@@ -1,5 +1,7 @@
 # desktop-tajo
 
+[NO LONGER MAINTAINED]
+
 Tajo Desktop Package Installation 
 
 “Tajo Desktop Package” is stand-alone version of Apache Tajo(TM), packaged by Gruter, Inc. It provides an easy way to set up Tajo DW engine on your Linux and Mac. Enjoy Tajo on your desktop! 
